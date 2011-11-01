@@ -5,8 +5,7 @@
 #'
 #' @param x a numeric vector
 #' @author Adam Loy \email{aloy@@istate.edu}
-sampleQuantiles <- function(x){
-# CHANGED: formerly sample.quantiles
+.sampleQuantiles <- function(x){
 	i <- 1:length(x)
 	p <- (i - .5)/length(x)
 	return(p)
@@ -15,17 +14,17 @@ sampleQuantiles <- function(x){
 #' Constructing a normal quantile-quantile plot
 #'
 #' This function will construct a normal quantile-quantile plot within
-#' the ggplot framework.
+#' the \code{ggplot} framework.
 #'
 #' @param x a numeric vector
-#' @param line a logical value. If TRUE, a line will be plotted connecting 
-#'	the first and third quartiles.
-#' @param ... other arguments to be passed to qplot
+#' @param line the method used to fit a reference line. If no reference line is desired,
+#' leave the value as \code{NULL}. \code{line = "rlm"} will use robust regression to fit a
+#' reference line. \code{line = "quantile"} will fit a line through the first and third quartiles.
+#' @param ... other arguments to be passed to \code{qplot()}
 #' @author Adam Loy \email{aloy@@istate.edu}
+#' @export
 ggplot_qqnorm <- function(x, line = NULL, ...){
-# CHANGED: formerly qqnorm.gg
-# CHANGED: allows user to specify how to fit line (rlm or quantiles)
-	p <- sampleQuantiles(x)
+	p <- .sampleQuantiles(x)
 	theory <- qnorm(p = p)
 	yp <- sort(x)
 		ret <- qplot(x = theory, y = yp, xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", ...)
@@ -45,17 +44,17 @@ ggplot_qqnorm <- function(x, line = NULL, ...){
 #' Constructing a normal probability plot
 #'
 #' This function will construct a normal probability plot within
-#' the ggplot framework.
+#' the \code{ggplot} framework.
 #'
 #' @param x a numeric vector
-#' @param line a logical value. If TRUE, a line will be plotted connecting 
-#'	the first and third quartiles.
-#' @param ... other arguments to be passed to qplot
+#' @param line the method used to fit a reference line. If no reference line is desired, leave the
+#' value as \code{NULL}. \code{line = "rlm"} will use robust regression to fit a reference line.
+#' \code{line = "quantile"} will fit a line through the first and third quartiles.
+#' @param ... other arguments to be passed to \code{qplot()}
 #' @author Adam Loy \email{aloy@@istate.edu}
+#' @export
 ggplot_ppnorm <- function(x, line = NULL, ...){
-# CHANGED: formerly ppnorm.gg
-# CHANGED: allows user to specify how to fit line (rlm or quantiles)
-	p <- sampleQuantiles(x)
+	p <- .sampleQuantiles(x)
 	yp <- sort(x)
 	ret <- qplot(x = yp, y = qnorm(p), xlab = "x", ylab = "Theoretical Quantiles", ...)
 	if(!is.null(line)){
@@ -79,7 +78,6 @@ ggplot_ppnorm <- function(x, line = NULL, ...){
 #' @param x a numeric vector
 #' @author Adam Loy \email{aloy@@istate.edu}
 pplineInfo <- function(x){
-# CHANGED: formerly ppline.gg
 	yp <- quantile(x, c(0.25, 0.75))
 	theory <- qnorm(p = c(0.25, 0.75))
 	slope <- diff(theory)/diff(yp)
@@ -89,15 +87,19 @@ pplineInfo <- function(x){
 
 #' Adding simultaneous confidence bands to normal probability plots
 #'
-#' This function calculates simultaneous confidence bands for the estimated cdf
-#' using the logistic-transform normal-approximation method (see Meeker and Escobar 1998 
-#' for more info.)
+#' This function calculates simultaneous confidence bands for the estimated cdf using the
+#' logistic-transform normal-approximation method. 
+#'
+#' Information on how to find the approximate factors \code{e} can be found in Meeker and Escobar (1998)
+#' on page 61. They provide a table which summarizes some common choices for the factor.
 #'
 #' @param x a vector of probabilities
 #' @param e factors for EP simultaneous approx. confidence bands (see Nair 1984 or Meeker and Escobar 1998)
 #' @author Adam Loy \email{aloy@@iastate.edu}
+#' @references Meeker, W. Q. and Escobar, L. A. (1998), \emph{Statistical Methods for Reliability Data},
+#' New York, NY: Wiley.
+#' @export
 ppnormBand <- function(x, e){
-# CHANGED: formerly ppnorm.band
 	F <- x
 	se <- sqrt(F * (1 - F) / length(F))
 	w <- exp((e * se) / (F * (1 - F)))
@@ -113,7 +115,6 @@ ppnormBand <- function(x, e){
 #' @param x a numeric vector
 #' @author Adam Loy \email{aloy@@istate.edu}
 qqlineInfo <- function(x){
-# CHANGED: formerly qqline.gg
 	yp <- quantile(x, c(0.25, 0.75))
 	theory <- qnorm(p = c(0.25, 0.75))
 	slope <- diff(yp)/diff(theory)
@@ -129,11 +130,18 @@ qqlineInfo <- function(x){
 #' do not share a common slope.
 #'
 #' @param x a numeric vector from which quantiles will be calculated
-#' @param group a vector indicating group membership for each value in x.
+#' @param group a vector indicating group membership for each value in \code{x}.
+#' @param line the method used to fit reference lines. If no reference lines are desired,
+#' leave the value as \code{NULL}. \code{line = "rlm"} will use robust regression to fit
+#' reference lines. \code{line = "quantile"} will fit lines through the first and third quartiles.
 #' @param ... other arguments to be passed to ggplot
+#' @param alpha_point alpha value specified for the points
+#' @param alpha_line alpha value specified for the lines
 #' @author Adam Loy \email{aloy@@istate.edu}
+#' @references Hilden-Minton, J. A. (1995), ``Mulilevel Diagnostics for Mixed and Hierarchical Linear Models,''
+#' Ph.D. thesis, University of California Los Angeles. 
+#' @export
 group_qqnorm <- function(x, group, line = NULL, alpha_point = 1, alpha_line = 1, ...){
-# CHANGED: formerly group.qqnorm
 	# Finding the slope and intercept for each group
 	qq.list <- split(x, group)
 	if(is.null(line) == FALSE){
@@ -142,7 +150,7 @@ group_qqnorm <- function(x, group, line = NULL, alpha_point = 1, alpha_line = 1,
 		}
 		if(line == "rlm"){
 			qq.coefs <- lapply(qq.list, function(j){
-				p <- sampleQuantiles(j)
+				p <- .sampleQuantiles(j)
 				theory <- qnorm(p = p)
 				yp <- sort(j)
 				coef(rlm(yp ~ theory))
@@ -155,7 +163,7 @@ group_qqnorm <- function(x, group, line = NULL, alpha_point = 1, alpha_line = 1,
 	
 	# Defining the quantiles of interest for each group
 	group.quant <- data.frame(x = x, group = group)
-	group.quant <- ddply(group.quant, .(group), transform, p = sampleQuantiles(x), yp = sort(x))
+	group.quant <- ddply(group.quant, .(group), transform, p = .sampleQuantiles(x), yp = sort(x))
 	group.quant <- ddply(group.quant, .(group), transform, theory = qnorm(p = p))
 	#llply(qq.list, transform, p=sample.quantiles(df), yp= sort(df), theory = qnorm(p = p))
 	

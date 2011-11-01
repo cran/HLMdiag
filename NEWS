@@ -1,0 +1,6 @@
+
+* Created 'adjust_lmList' class to handle fitting separate linear models when a factor is constant across the group.
+* 'random_ls_coef' was removed and replaced by the 'coef' method for 'adjust_lmList' objects.
+* Added 'rvc' diagnostic.
+* Extended 'case_delete' from only handling deletion for fixed effects to also handling deletion for variance components.
+* Improved 'dotplot_diag' to handle modified dotplots.

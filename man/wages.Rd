@@ -42,7 +42,7 @@ Singer, J. D. and Willett, J. B. (2003), \emph{Applied Longitudinal Data Analysi
 Cook, D. and Swayne, D. F. (2007), \emph{Interactive and Dynamic Graphics for Data Analysis with R and GGobi}, Springer.
 }
 \examples{
-	str(wages)
-	summary(wages)
-	lmer(lnw ~ exper + (exper | id), data = wages)
+str(wages)
+summary(wages)
+lmer(lnw ~ exper + (exper | id), data = wages)
 }

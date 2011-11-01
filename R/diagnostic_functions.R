@@ -1,146 +1,138 @@
-#' Calculating Cook's Distance
-#' 
-#' This function can be used to calculate Cook's Distance for the fixed effects
-#' or variance components for a hierarchical linear model.
-#'
-#' @param model an object contatining the original hierarchical model fit using lmer()
-#' @param delete an object containing the output returned by the case.delete function
-#' @param type specifies whether Cook's Distance will be calculated for the fixed effects ("fixef")
-#'   or the covariance parameters ("vcov")
-#' @author Adam Loy \email{aloy@@istate.edu}
-#' @examples
-#' wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-#' wages.fm1.del <- case.delete(wages.fm1, group = "id")
-#' CooksD(model = wages.fm1, delete = wages.fm1.del, type = "fixef")
-cooksd_hlm <- function(model, delete, type){ #CHANGED: renamed cooksd.hlm -> cooksd_hlm
-	if(!is.element(type, c("fixef", "vcov")))
-		stop("type must either be specified as 'fixef' or 'vcov'", call. = FALSE)
-	groups <- rownames(delete$fixef.delete)
-	
-	if(type == "fixef"){
-		rank.X <- qr(model.matrix(model))$rank
-		cook <- NULL
-		for(i in 1:length(groups)){
-			change.fixef <- as.matrix(delete$fixef.original - delete$fixef.delete[i,])
-			cook <- c(cook, t(change.fixef) %*% ginv(as.matrix(vcov(model))) %*% change.fixef / rank.X)
-		}
-	}
-	return(cook)
+#' @export
+cooksd_hlm <- function(model, delete){
+  groups <- rownames(delete$fixef.delete, do.NULL = FALSE, prefix = "")
+  rank.X <- qr(model.matrix(model))$rank
+
+  cook <- NULL
+  for(i in 1:length(groups)){
+    change.fixef <- as.matrix(delete$fixef.original - delete$fixef.delete[i,])
+    cook <- c(cook, t(change.fixef) %*% ginv(as.matrix(vcov(model))) %*% change.fixef / rank.X)
+  }
+
+  return(cook)
 }
 
-#' Calculating Multivariate DFFITS
-#' 
-#' This function can be used to calculate the multivariate DFFITS (or MDFFITS) for the fixed effects
-#' or variance components for a hierarchical linear model.
-#'
-#' @param model an object contatining the original hierarchical model fit using lmer()
-#' @param delete an object containing the output returned by the case.delete function
-#' @param type specifies whether Cook's Distance will be calculated for the fixed effects ("fixef")
-#'   or the covariance parameters ("vcov")
-#' @author Adam Loy \email{aloy@@istate.edu}
-#' @examples
-#' wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-#' wages.fm1.del <- case.delete(wages.fm1, group = "id")
-#' mdffits(model = wages.fm1, delete = wages.fm1.del, type = "fixef")
-mdffits_hlm <- function(model, delete, type){ #CHANGED: renamed mdffits.hlm -> mdffits_hlm
-	if(!is.element(type, c("fixef", "vcov")))
-		stop("type must either be specified as 'fixef' or 'vcov'", call. = FALSE)
-	groups <- rownames(delete$fixef.delete)
-	
-	if(type == "fixef"){
-		rank.X <- qr(model.matrix(model))$rank
-		MDFFITS <- NULL
-		for(i in 1:length(groups)){
-			change.fixef <- as.matrix(delete$fixef.original - delete$fixef.delete[i,])
-			MDFFITS <- c(MDFFITS, t(change.fixef) %*% ginv(as.matrix(delete$vcov.delete[[i]])) %*% change.fixef / rank.X)
-		}	
-	}
-	return(MDFFITS)
+#--------------------------------------
+#' @export
+mdffits_hlm <- function(model, delete){
+  groups <- rownames(delete$fixef.delete, do.NULL = FALSE, prefix = "")
+  rank.X <- qr(model.matrix(model))$rank
+
+  MDFFITS <- NULL
+  for(i in 1:length(groups)){
+    change.fixef <- as.matrix(delete$fixef.original - delete$fixef.delete[i,])
+    MDFFITS <- c(MDFFITS, t(change.fixef) %*% ginv(as.matrix(delete$vcov.delete[[i]])) %*% change.fixef / rank.X)
+  }	
+
+  return(MDFFITS)
 }
 
-#' Calculating COVTRACE
-#' 
-#' This function can be used to calculate the COVTRACE for the fixed effects
-#' or variance components for a hierarchical linear model. This is  a measure of
-#' the precision of those estimates.
-#'
-#' @param model an object contatining the original hierarchical model fit using lmer()
-#' @param delete an object containing the output returned by the case.delete function
-#' @param type specifies whether Cook's Distance will be calculated for the fixed effects ("fixef")
-#'   or the covariance parameters ("vcov")
-#' @author Adam Loy \email{aloy@@istate.edu}
-#' @examples
-#' wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-#' wages.fm1.del <- case.delete(wages.fm1, group = "id")
-#' covtrace(model = wages.fm1, delete = wages.fm1.del, type = "fixef")
-covtrace_hlm <- function(model, delete, type){ #CHANGED: renamed covtrace.hlm -> covtrace_hlm
-	if(!is.element(type, c("fixef", "vcov")))
-		stop("type must either be specified as 'fixef' or 'vcov'", call. = FALSE)
-	groups <- rownames(delete$fixef.delete)
-	
-	if(type == "fixef"){
-		rank.X <- qr(model.matrix(model))$rank
-		COVTRACE <- NULL
-		for(i in 1:length(groups)){
-			V.original <- as.matrix(vcov(model))
-			V.delete <- as.matrix(delete$vcov.delete[[i]])
-			COVTRACE <- c(COVTRACE, abs(sum(diag(ginv(V.original) %*% V.delete)) - rank.X))
-		}
-	}
-	return(COVTRACE)	
+#--------------------------------------
+#' @export
+covtrace_hlm <- function(model, delete){
+  groups <- rownames(delete$fixef.delete, do.NULL = FALSE, prefix = "")
+  rank.X <- qr(model.matrix(model))$rank
+
+  COVTRACE <- NULL
+  for(i in 1:length(groups)){
+    V.original <- as.matrix(vcov(model))
+    V.delete <- as.matrix(delete$vcov.delete[[i]])
+    COVTRACE <- c(COVTRACE, abs(sum(diag(ginv(V.original) %*% V.delete)) - rank.X))
+  }
+
+  return(COVTRACE)	
 }
 
-#' Calculating COVRATIO
-#' 
-#' This function can be used to calculate the COVRATIO for the fixed effects
-#' or variance components for a hierarchical linear model. This is  a measure of
-#' the precision of those estimates.
-#'
-#' @param model an object contatining the original hierarchical model fit using lmer()
-#' @param delete an object containing the output returned by the case.delete function
-#' @param type specifies whether Cook's Distance will be calculated for the fixed effects ("fixef")
-#'   or the covariance parameters ("vcov")
-#' @author Adam Loy \email{aloy@@istate.edu}
-#' @examples
-#' wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-#' wages.fm1.del <- case.delete(wages.fm1, group = "id")
-#' covratio(model = wages.fm1, delete = wages.fm1.del, type = "fixef")
-covratio_hlm <- function(model, delete, type){ #CHANGED: renamed covtrace.hlm -> covtrace_hlm
-	if(!is.element(type, c("fixef", "vcov")))
-		stop("type must either be specified as 'fixef' or 'vcov'", call. = FALSE)
-	groups <- rownames(delete$fixef.delete)
-	if(type == "fixef"){		
-		COVRATIO <- NULL
-		for(i in 1:length(groups)){
-			V.original <- as.matrix(vcov(model))
-			V.delete <- as.matrix(delete$vcov.delete[[i]])
-			COVRATIO <- c(COVRATIO, det(V.delete) / det(V.original))
-		}
-	}
-	return(COVRATIO)
+#--------------------------------------
+#' @export
+covratio_hlm <- function(model, delete){
+  groups <- rownames(delete$fixef.delete, do.NULL = FALSE, prefix = "")
+
+  COVRATIO <- NULL
+  for(i in 1:length(groups)){
+    V.original <- as.matrix(vcov(model))
+    V.delete <- as.matrix(delete$vcov.delete[[i]])
+    COVRATIO <- c(COVRATIO, det(V.delete) / det(V.original))
+  }
+
+  return(COVRATIO)
 }
 
-#' Calculating diagnostics for hierarchical linear models.
+#--------------------------------------
+#' @export
+rvc <- function(delete){
+	res <- do.call('rbind', lapply(delete$varcomp.delete, function(x){ (x / delete$varcomp.original) - 1}))
+	return(res)
+}
+
+#' Calculating diagnostics for two-level hierarchical linear models.
 #'
-#' This is a wrapper function that calls the all of the diagnostic functions
-#' for a hierarchical model. The function returns a data frame with columns
-#' for each diagnostic (cook's d, mdffits, covtrace, and covratio) and
-#' a column for the group id.
+#' This group of functions is used to compute deletion diagnostics for a
+#' two-level normal hierarchical model at both levels of the model.
 #'
-#' @param model an object contatining the original hierarchical model fit using lmer()
-#' @param delete an object containing the output returned by the case.delete function
-#' @param type specifies whether Cook's Distance will be calculated for the fixed effects ("fixef")
-#'   or the covariance parameters ("vcov")
-#' @author Adam Loy \email{aloy@@istate.edu}
+#' The primary function if \code{diagnostics} which returns either a
+#' list or data frame of influence measures depending on whether
+#' \code{type = "both"} or if only one aspect of the model is selected.
+#' If \code{type = "both}, then a list with Cook's distance, MDFFITS,
+#' COVTRACE, and COVRATIO are returned for the fixed effects and
+#' relative variance change (RVC) is returned for the variance components.
+#'
+#' The functions \code{cooksd_hlm}, \code{mdffits_hlm}, \code{covtrace_hlm},
+#' \code{covratio_hlm}, and \code{rvc} can be used for direct computation
+#' of the corresponding diagnostic quantities.
+#'
+#' @aliases cooksd_hlm mdffits_hlm covtrace_hlm covratio_hlm rvc
+#' @param model an object contatining the original hierarchical model fit using \code{lmer()}
+#' @param delete an object containing the output returned by \code{case_delete()}
+#' @author Adam Loy \email{aloy@@iastate.edu}
+#' @references Christensen, R., Pearson, L.M., and Johnson, W. (1992),
+#' ``Case-Deletion Diagnostics for Mixed Models,'' \emph{Technometrics},
+#' 34, 38 -- 45.
+#'
+#' Dillane, D. (2005), ``Deletion Diagnostics for the Linear Mixed Model,''
+#' Ph.D. thesis, Trinity College Dublin.
+#'
+#' Schabenberger, O. (2004),``Mixed Model Influence Diagnostics,''
+#' in \emph{Proceedings of the Twenty-Ninth SAS Users Group International Conference},
+#' SAS Users Group International.
+#'
 #' @examples
-#' wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-#' wages.fm1.del <- case.delete(wages.fm1, group = "id")
-#' diagnostics(model = wages.fm1, delete = wages.fm1.del, type = "fixef")
-diagnostics <- function(model, delete, type){
-	if(!is.element(type, c("fixef", "vcov")))
-		stop("type must either be specified as 'fixef' or 'vcov'", call. = FALSE)
-	
-	ids <- as.vector(rownames(delete$fixef.delete))
-	
-	return(data.frame(IDS = ids, COOKSD = cooksd_hlm(model, delete, type), MDFFITS = mdffits_hlm(model, delete, type), COVTRACE = covtrace_hlm(model, delete, type), COVRATIO = covratio_hlm(model, delete, type)))
+#' data(Oxboys, package = 'mlmRev')
+#' fm <- lmer(formula = height ~ age + I(age^2) + (age + I(age^2)| Subject), data = Oxboys)
+#' fmDel <- case_delete(model = fm, group = TRUE, type = "both")
+#' fmDiag <- diagnostics(model = fm, delete = fmDel)
+#' 
+#' \dontrun{
+#' library(mlmRev)
+#' exm1 <- lmer(normexam ~ standLRT + sex + schgend + (1 | school), data = Exam)
+#' exm1DEL <- case_delete(model = exm1, group = TRUE, type = "both")
+#' exm1DIAG <- diagnostics(model = exm1, delete = exm1DEL)
+#' }
+#' @export
+diagnostics <- function(model, delete){
+  type <- attributes(delete)$type
+  if(type %in% c("fixef", "both")){
+    ids <- as.vector(rownames(delete$fixef.delete, do.NULL = FALSE, prefix = ""))
+  }
+  else{
+    ids <- as.vector(names(delete$varcomp.delete))
+    if(is.null(ids)) ids <- 1:length(delete$varcomp.delete)
+  }
+  if(type  %in% c("fixef", "both")){
+    res1 <- data.frame(IDS = ids, COOKSD = cooksd_hlm(model, delete),
+                       MDFFITS = mdffits_hlm(model, delete),
+                       COVTRACE = covtrace_hlm(model, delete),
+                       COVRATIO = covratio_hlm(model, delete))
+    if(type == "fixef") return(res1)
+  }
+
+  if(type %in% c("varcomp", "both")){
+    res2 <- data.frame(IDS = ids, rvc(delete))
+    if(type == "varcomp") return(res2)
+  }
+
+  if(type == "both"){
+    res <- list(fixef_diag = res1, varcomp_diag = res2)
+    return(res)
+  } 
 }
