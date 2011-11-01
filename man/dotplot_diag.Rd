@@ -14,7 +14,8 @@
   \code{"varcomp"}.}
 
   \item{name}{specification of which diagnostic to plot
-  (either COOKSD, MDFFITS, COVTRACE, COVRATIO, or rvc).}
+  (either COOKSD, MDFFITS, COVTRACE, COVRATIO, or the name
+  of the variance component for rvc).}
 
   \item{cutoff}{value specifying unusual values of the
   diagnostic}

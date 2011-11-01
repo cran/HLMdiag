@@ -9,11 +9,14 @@ export("adjust_lmList",
 	"ggplot_qqnorm",
 	"ggplot_ppnorm",
 	"group_qqnorm",
+	"HLMresid",
 	"LSresids",
 	"mdffits_hlm",
 	"ppnormBand",
 	"rvc",
-	".sampleQuantiles"
+	".sampleQuantiles",
+	".parse_formula",
+	".parse_f"
 )
 
 exportClasses("adjust_lmList")

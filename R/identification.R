@@ -8,9 +8,12 @@
 #' @param identify the percentage of points to identify as unusual
 #' @author Adam Loy \email{aloy@@istate.edu}
 #' @export
-identify_resid <- function(formula, identify){
-	model <- lm(formula = formula)
-	res <- resid(model)
+identify_resid <- function(eb, ols, identify){
+#	model <- lm(formula = formula)
+	yhat <- eb
+#	attr(yhat, "names") <- rownames(eb)
+	res <- ols - yhat
+#	res <- resid(model)
 	res <- res[order(abs(res), decreasing = TRUE)]
 	unusual <- rep(FALSE, length(res))
 	n <- round(length(res) * identify)

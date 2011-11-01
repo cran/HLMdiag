@@ -8,6 +8,16 @@
 \title{Calculating diagnostics for two-level hierarchical linear models.}
 \usage{
   diagnostics(model, delete)
+
+  cooksd_hlm(model, delete)
+
+  mdffits_hlm(model, delete)
+
+  covtrace_hlm(model, delete)
+
+  covratio_hlm(model, delete)
+
+  rvc(delete)
 }
 \arguments{
   \item{model}{an object contatining the original

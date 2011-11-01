@@ -15,17 +15,20 @@
 #' rancoef.ols <- coef(wages.sepLM)
 #' compare_eb_ls(eb = rancoef.eb, ols = rancoef.ols, identify = 0.01)
 #' @export
-compare_eb_ls <- function(eb, ols, identify = FALSE, ...){
+compare_eb_ls <- function(eb, ols, identify = FALSE, silent = TRUE, ...){
 	ret <- NULL
 	for(i in 1:dim(ols)[2]){
-	p <- qplot(x = eb[,i], y = ols[,i], geom = "point", main = colnames(eb)[i], xlab = "shrinkage estimate", ylab = "LS estimate", ...) + 
-			geom_abline(intercept = 0, slope = 1) +
+	p <- qplot(x = eb[,i], y = ols[,i], geom = "point", main = substr(colnames(eb)[i], 4, nchar(colnames(eb)[i])), 
+	xlab = "EB resid", ylab = "LS resid", ...) + 
+			geom_abline(intercept = 0, slope = 1, aes(linetype = I(2))) +
 			geom_smooth(method = "lm", se = FALSE) 
 		if(identify != FALSE){
-			extreme <- identify_resid(formula = ols[,i] ~ eb[,i], identify = identify)
-			dat <- cbind(eb = eb[,i], ols = ols[,i])
+			temp_eb <- eb[,i]
+			attr(temp_eb, "names") <- rownames(eb)
+			extreme <- identify_resid(eb = temp_eb, ols = ols[,i], identify = identify)
+			dat <- cbind(eb = temp_eb, ols = ols[,i])
 			dat <- as.data.frame(dat)
-			dat$ids <- row.names(dat)
+			dat$ids <- names(temp_eb)
 			extreme <- merge(x = dat, y = extreme)
 			# extreme <- cbind(dat, extreme)
 			# extreme <- extreme[order(abs(extreme$residual), decreasing = TRUE), ]
@@ -39,6 +42,9 @@ compare_eb_ls <- function(eb, ols, identify = FALSE, ...){
         on.exit(devAskNewPage(oask))
 	print(p)
 	}
-	ret <- list(ret[[1]][[2]], ret[[2]])
-	return(ret)
+	
+	if(silent == FALSE){
+		ret <- list(ret[[1]][[2]], ret[[2]])
+		return(ret)
+	}
 }
