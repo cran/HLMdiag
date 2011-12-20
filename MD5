@@ -1,7 +1,7 @@
-c669caaa74f556faf43dd696598be48e *DESCRIPTION
+3a685f8ae1c61e1d17809feaa703b7b4 *DESCRIPTION
 bf4489434aa5bb900c404fbecb286c11 *NAMESPACE
-945c033657862f942eb556c0d3c36a42 *NEWS
-a4c185f37aeebf02b1b62a4cf349f0a7 *R/HLMresid.R
+b84513c0f67b29207d13b1abaa811506 *NEWS
+a92bdfc7bfa044f220959c4c32d41598 *R/HLMresid.R
 8d52918039934decf03fa56afa705f39 *R/LSresids.R
 160a949f2f36194b785d5e83e47cb6fd *R/adjust_formula_lmList.R
 63bda2da0ef1dcb4d38ec49bb57b35c8 *R/case_delete.R
@@ -12,7 +12,7 @@ a4c185f37aeebf02b1b62a4cf349f0a7 *R/HLMresid.R
 6f2ce1853479b953303c67dd17247a77 *R/plot_functions.R
 105ae33a096607b5fd5b8d67ef1c1c0e *R/quantile_functions.R
 5ebea90681601c4a86c770c212855632 *data/wages.RData
-0993fdc5acf6402f71de238decf2630c *man/HLMresid.Rd
+92a3f2c315e6da83773adb281c29300b *man/HLMresid.Rd
 bf17dd36e803adf6ede677c0524c25a0 *man/LSresids.Rd
 7b28a1fbf13171007454f2be9018a3df *man/adjust_lmList-class.Rd
 657254a2fb804413b8e09b7b48377857 *man/adjust_lmList.Rd

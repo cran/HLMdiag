@@ -22,9 +22,13 @@
 #'  must be specified.
 #' @param data optional argument giving the data frame used for LS residuals. This
 #'  is used mainly for when dealing with simulations.
-HLMresid <- function(object, level = c(1, 2), type = c("both", "LS", "EB"), sim = NULL, semi.standardize = TRUE){
+HLMresid <- function(object, level = c(1, 2), type = c("both", "LS", "EB", "marginal"), sim = NULL, semi.standardize = TRUE){
 	type <- match.arg(type)
 	if(is.null(data)){data <- object@frame}
+	
+	if(type == "marginal"){
+		return(object@y - object@X %*% fixef(object))
+	}
 	
 	if(1 %in% level){
 		if(type != "EB"){
@@ -46,7 +50,6 @@ HLMresid <- function(object, level = c(1, 2), type = c("both", "LS", "EB"), sim 
 	
 	level.1 <- level.2 <- NULL
 
-# What is the best way to return these??
 	if(type == "EB"){
 		if(1 %in% level){
 			level.1 <- cbind(EB.resid = EB1)
