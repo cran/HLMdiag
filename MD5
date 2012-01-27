@@ -1,12 +1,12 @@
-3a685f8ae1c61e1d17809feaa703b7b4 *DESCRIPTION
+e9f385e56a6663bff8dcaa1fa991485d *DESCRIPTION
 bf4489434aa5bb900c404fbecb286c11 *NAMESPACE
-b84513c0f67b29207d13b1abaa811506 *NEWS
+640f6be59568672ed2e14a4c3efa42fa *NEWS
 a92bdfc7bfa044f220959c4c32d41598 *R/HLMresid.R
 8d52918039934decf03fa56afa705f39 *R/LSresids.R
 160a949f2f36194b785d5e83e47cb6fd *R/adjust_formula_lmList.R
 63bda2da0ef1dcb4d38ec49bb57b35c8 *R/case_delete.R
 7199e53e46e3fef659ae419afe9b9384 *R/diagnostic_functions.R
-647e258fe7602d72cd6762c2bffc4547 *R/group_level_residual_functions.R
+041ccd873d783fb748042f795f188977 *R/group_level_residual_functions.R
 8f08f47fb4ec099bd6758e3ae9317225 *R/identification.R
 53ef520d93db6410da093b09358e57c0 *R/parse_formula.R
 6f2ce1853479b953303c67dd17247a77 *R/plot_functions.R

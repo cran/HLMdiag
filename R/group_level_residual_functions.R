@@ -18,9 +18,9 @@
 compare_eb_ls <- function(eb, ols, identify = FALSE, silent = TRUE, ...){
 	ret <- NULL
 	for(i in 1:dim(ols)[2]){
-	p <- qplot(x = eb[,i], y = ols[,i], geom = "point", main = substr(colnames(eb)[i], 4, nchar(colnames(eb)[i])), 
+	p <- qplot(x = eb[,i], y = ols[,i], geom = "point", main = colnames(eb)[i], 
 	xlab = "EB resid", ylab = "LS resid", ...) + 
-			geom_abline(intercept = 0, slope = 1, aes(linetype = I(2))) +
+			geom_abline(intercept = 0, slope = 1, linetype = I(2)) +
 			geom_smooth(method = "lm", se = FALSE) 
 		if(identify != FALSE){
 			temp_eb <- eb[,i]
