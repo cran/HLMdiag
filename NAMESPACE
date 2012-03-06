@@ -1,3 +1,5 @@
+importFrom(stats4, coef, confint, plot)
+
 export("adjust_lmList",
 	"case_delete",
 	"compare_eb_ls",
