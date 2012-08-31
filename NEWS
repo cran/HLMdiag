@@ -1,3 +1,7 @@
+HLMdiag 0.1.6 ------------------------------------------------------
+* Updates for compatibility with ggplot2 >= 0.9.2
+* Updates to NAMESPACE
+
 HLMdiag 0.1.5 ------------------------------------------------------
 * Updates to NAMESPACE to fix compatibility issues
 

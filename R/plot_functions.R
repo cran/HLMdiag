@@ -42,12 +42,19 @@ dotplot_diag <- function(data, type = c("fixef", "varcomp"), name, cutoff = NULL
             geom_text(data = subset(data, extreme == TRUE), aes(label = IDS, hjust=.5, vjust=1.5, size=3))
         }
 
-        p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
-          geom_hline(aes(yintercept = cutoff), colour=I("red")) +
-           # geom_text(data = subset(data, extreme == TRUE), aes(label = IDS, hjust=.5, vjust=1.5, size=3)) + 
-              opts(legend.position = "none") +
+		ver <- as.numeric_version(packageVersion("ggplot2"))
+		if(ver >= as.numeric_version("0.9.2")) {
+        	p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
+          		geom_hline(aes(yintercept = cutoff), colour=I("red")) +
+              	theme(legend.position = "none") +
                 coord_flip()
-      }
+      	} else{
+        	p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
+          		geom_hline(aes(yintercept = cutoff), colour=I("red")) +
+              	opts(legend.position = "none") +
+                coord_flip()      			
+      	}
+    }
 
       else{
         data$extreme <- with(data, get(name) < cutoff[1] | get(name) > cutoff[2])
@@ -62,12 +69,21 @@ dotplot_diag <- function(data, type = c("fixef", "varcomp"), name, cutoff = NULL
             geom_text(data = subset(data, extreme == TRUE), aes(label = IDS, hjust=.5, vjust=1.5, size=3))
         }
 
-        p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
-          geom_hline(aes(yintercept = cutoff[1]), colour=I("red")) + 
-            geom_hline(aes(yintercept = cutoff[2]), colour=I("red")) + 
-            #  geom_text(data = subset(data, extreme == TRUE), aes(label = IDS, hjust=.5, vjust=1.5, size=3)) + 
+		    ver <- as.numeric_version(packageVersion("ggplot2"))
+		    if(ver >= as.numeric_version("0.9.2")) {
+        	p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
+          		geom_hline(aes(yintercept = cutoff[1]), colour=I("red")) + 
+            	geom_hline(aes(yintercept = cutoff[2]), colour=I("red")) + 
+                theme(legend.position = "none") +
+                coord_flip()	
+        } else{
+        	p + geom_point(data = subset(data, extreme == FALSE), colour = I("blue")) + 
+          		geom_hline(aes(yintercept = cutoff[1]), colour=I("red")) + 
+            	geom_hline(aes(yintercept = cutoff[2]), colour=I("red")) + 
                 opts(legend.position = "none") +
-                  coord_flip()	
+                coord_flip()		        	
+       }
+        
       }
     }
   }	

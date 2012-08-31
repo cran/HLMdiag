@@ -1,3 +1,7 @@
+import(methods)
+import(plyr)
+import(reshape2)
+import(MASS)
 importFrom(stats4, coef, confint, plot)
 
 export("adjust_lmList",

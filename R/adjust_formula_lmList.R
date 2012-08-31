@@ -31,7 +31,7 @@ problem_factor_groups <- function(formula, data){
 	colnames(one_level_factor) <- c(g, are_factors)
 	
 	for(i in 1:length(are_factors)){
-		cast_model_frame <- cast(molten_model_frame, paste(g, "~", are_factors[i]), length)
+		cast_model_frame <- dcast(molten_model_frame, paste(g, "~", are_factors[i]), length)
 		if(i == 1) one_level_factor[,1] <- cast_model_frame[,1]
 		one_level_factor[,(i + 1)] <- apply(cast_model_frame[,-1], 1, function(x){
 			empty_factors <- sum(x == 0)
