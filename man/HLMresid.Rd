@@ -1,44 +1,122 @@
 \name{HLMresid}
 \alias{HLMresid}
-\title{Extracting residuals from two-level HLMs}
+\title{Calculating residuals from HLMs}
 \usage{
-  HLMresid(object, level = c(1, 2), type = c("both", "LS", "EB", "marginal"), sim = NULL, semi.standardize = TRUE)
+  HLMresid(object, level, type = "EB", sim = NULL,
+    standardize = FALSE)
 }
 \arguments{
-  \item{object}{a fitted model object of class \code{mer}.}
+  \item{object}{an object of class \code{mer}.}
 
-  \item{level}{the level from which the residuals should be extracted; either 
-\code{1} or \code{2} (both can be specified).}
+  \item{level}{which residuals should be extracted: 1 for
+  within-group (case-level) residuals, the name of a
+  grouping factor (as defined in \code{flist} of the
+  \code{mer} object) for between-group residuals, or
+  \code{marginal}.}
 
-  \item{type}{the type of residual to be extracted; \code{"LS"}, \code{"EB"}, \code{"both"} (i.e. LS and EB), or \code{"marginal"}.}
+  \item{type}{how are the residuals predicted: either
+  \code{"EB"} or \code{"LS"} (the default is \code{"EB"}).}
 
-  \item{sim}{an optional data vector containing a (simulated) response variable.}
+  \item{sim}{optional argument giving the data frame used
+  for LS residuals. This is used mainly for dealing with
+  simulations.}
 
-  \item{semi.standardize}{if \code{TRUE} the
-  semi-standardized residuals will also be returned. This argument is only used when \code{level = 1}.}
-}
-\value{
-  If \code{type = "marginal"} is specified, a numeric vector of the marginal residuals is returned. 
-  Otherwise, a data frame is returned containing the following:
-  \itemize{
-    \item When \code{level=1}: the model frame, the residuals (\code{LS.resid} and/or \code{EB.resid}),  the fitted values (\code{fitted}), and, if \code{semi.standardize = TRUE}, the diagonal elements of the hat matrix (\code{hat}), the semi-standardized residuals (\code{semi.std.resid})
-
-    \item When \code{level=2}: the LS and/or EB residuals corresponding to each random effect.
-
-    \item When \code{level = c(1, 2)}: a list with elements \code{level.1} and \code{level.2}. Each element is specified as stated above.
-  }
+  \item{standardize}{if \code{standardize = TRUE} the
+  standardized residuals will be returned; if
+  \code{standardize = "semi"} then the semi-standardized
+  level-1 residuals will be returned. Note that for
+  higher-level residuals of \code{type = "LS"},
+  \code{standardize = TRUE} does not result in standardized
+  residuals as they have not been implemented.}
 }
 \description{
-  This is a wrapper function to extract the residuals from a two-level normal hierarchical
-  linear model (HLM) fit using \code{lmer}. The EB residuals are extracted using
-  using the functions \code{resid} and \code{ranef} for levels 1 and 2, respectively.
-  To extract the LS residuals, \code{LSresids} is used.
+  \code{HLMresid} is a function that extracts residuals
+  from a hierarchical linear model fit using \code{lmer}.
+  That is, it is a unified framework that
+  extracts/calculates residuals from \code{mer} objects.
+}
+\details{
+  This function extracts residuals from the model, and can
+  extract residuals estimated using least squares (LS) or
+  Empirical Bayes (EB). This unified framework enables the
+  analyst to more easily conduct an upward residual
+  analysis during model exploration/checking.
+
+  The \code{HLMresid} function provides a wrapper that will
+  extract residuals from a fitted \code{mer} object. The
+  function provides access to residual quantities already
+  made available by the functions \code{resid} and
+  \code{ranef}, but adds additional functionality. Below is
+  a list of types of residuals that can be extracted.
+  \describe{ \item{raw level-1 residuals}{These are
+  equivalent to the residuals extracted by \code{resid} if
+  \code{level = 1}, \code{type = "EB"}, and
+  \code{standardize = FALSE} is specified. You can also
+  specify \code{type = "LS"} for LS residuals that are not
+  equivalent to those from \code{resid}.}
+  \item{standardized level-1 residuals}{Specify \code{level
+  = 1}, and \code{standardize = TRUE}. This works with both
+  \code{type = "EB"} or \code{"LS"}.}
+  \item{semi-standardized level-1 residuals}{Specify
+  \code{level = 1}, \code{type = "LS"} and
+  \code{standardize = "semi"}.} \item{raw group level
+  residuals}{These are equivalent to extracting the
+  predicted random effects for a given group using
+  \code{ranef}. Set \code{level} to a grouping factor name
+  and \code{type = "EB"}. \code{type = "LS"} can also be
+  specified, though this is less common.}
+  \item{standardized group level residuals}{Set
+  \code{level} to a grouping factor name, \code{type =
+  "EB"}, and \code{standardized = TRUE}. This will not
+  produce standardized residuals for \code{type = "LS"}.}
+  \item{marginal residuals}{The marginal residuals can be
+  obtained by setting \code{level = "marginal"}. Only
+  \code{type = "EB"} is implemented.} \item{cholesky
+  residuals}{These are essentially standardized marginal
+  residuals. To obtain cholesky residuals set \code{level =
+  "marginal"}, \code{type = "EB"}, and \code{standardize =
+  TRUE}.} } Note that \code{standardize = "semi"} is only
+  implemented for level-1 LS residuals.
 }
 \examples{
-data(Oxboys, package = 'mlmRev')
-fm <- lmer(formula = height ~ age + I(age^2) + (age + I(age^2)| Subject), data = Oxboys)
-level1Resids <- HLMresid(object = fm, level = c(1,2), type = "both", semi.standardize = TRUE)
+data(sleepstudy, package = "lme4")
+fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+
+# level-1 residuals
+all.equal(HLMresid(object = fm1, level = 1, type = "EB"), resid(fm1)) ## EB
+r1LS <- HLMresid(object = fm1, level = 1, type = "LS") ## raw LS resids
+head(r1LS)
+r1LS.std <- HLMresid(object = fm1, level = 1, type = "LS", standardize = TRUE) ## std. LS resids
+head(r1LS.std)
+
+# level-2 residuals
+all.equal(r2EB <- HLMresid(object = fm1, level = "Subject", type = "EB"), ranef(fm1)[["Subject"]])
+r2EB.std <- HLMresid(object = fm1, level = "Subject", type = "EB", standardize = TRUE)
+head(r2EB)
+head(r2EB.std)
+
+# marginal residuals
+mr <- HLMresid(object = fm1, level = "marginal")
+cholr <- HLMresid(object = fm1, level = "marginal", standardize = TRUE) # Cholesky residuals
 }
 \author{
   Adam Loy \email{aloy@istate.edu}
 }
+\references{
+  Hilden-Minton, J. (1995) Multilevel diagnostics for mixed
+  and hierarchical linear models. University of California
+  Los Angeles.
+
+  Houseman, E. A., Ryan, L. M., & Coull, B. A. (2004)
+  Cholesky Residuals for Assessing Normal Errors in a
+  Linear Model With Correlated Outcomes. \emph{Journal of
+  the American Statistical Association}, \bold{99}(466),
+  383--394.
+}
+\seealso{
+  \code{\link{LSresids}}, \code{\link{resid}},
+  \code{\link{ranef}}
+}
+\keyword{models}
+\keyword{regression}
+

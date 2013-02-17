@@ -1,46 +1,43 @@
 \name{LSresids}
 \alias{LSresids}
-\title{Calculating OLS residuals for a two-level hierarchical model}
+\title{Calculating least squares residuals}
 \usage{
-  LSresids(object, level, sim = NULL, semi.standardize = TRUE)
+  LSresids(object, level, sim = NULL, standardize = FALSE)
 }
 \arguments{
-  \item{object}{a fitted model object of class \code{mer}. }
+  \item{object}{an object of class \code{mer}.}
 
-  \item{level}{the level from which the residuals should be extracted; either 
-\code{1} or \code{2} (both can be specified).}
+  \item{level}{which residuals should be extracted: 1 for
+  case-level residuals or the name of a grouping factor (as
+  defined in \code{flist} of the \code{mer} object) for
+  between-group residuals.}
 
-  \item{sim}{an optional data vector containing a (simulated) response variable.}
+  \item{sim}{optional argument giving the data frame used
+  for LS residuals. This is used mainly when dealing with
+  simulations.}
 
-  \item{semi.standardize}{if \code{TRUE} the
-  semi-standardized residuals will also be returned. This argument is only used when \code{level = 1}.}
-}
-\value{
-  a data frame containing the following:
-  \itemize{
-    \item When \code{level=1}: the model frame, the LS residuals (\code{LS.resid}),  the fitted values (\code{fitted}), and, if \code{semi.standardize = TRUE}, the diagonal elements of the hat matrix (\code{hat}) and the semi-standardized residuals (\code{semi.std.resid})
-
-    \item When \code{level=2}: the LS residuals corresponding to each random effect.
-  }
+  \item{standardize}{if \code{TRUE} the standardized
+  level-1 residuals will also be returned (if \code{level =
+  1}); if \code{"semi"} then the semi-standardized level-1
+  residuals will be returned.}
 }
 \description{
-  This function calculates the least squares
-  residuals for a two-level hierarchical model. The
-  level-1 residuals are found by fitting separate LS regression models
-  to each case. The level-2 residuals are found by treating the random 
-  effects as fixed and fitting both separate and global linear models. The 
-  difference between the coefficients corresponding to the random effects 
-  are the level-2 residuals.
-}
-\examples{
-data(Oxboys, package = 'mlmRev')
-fm <- lmer(formula = height ~ age + I(age^2) + (age + I(age^2)| Subject), data = Oxboys)
-level1Resids <- LSresids(object = fm, level = c(1,2), semi.standardize = TRUE)
-
-\dontrun{wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
-LSresids(fobject = wages.fm1, level = c(1,2), semi.standardize = TRUE)}
+  This function calculates least squares (LS) residuals
+  found by fitting separate LS regression models to each
+  case. For examples see the documentation for
+  \code{HLMresid}.
 }
 \author{
   Adam Loy \email{aloy@istate.edu}
 }
+\references{
+  Hilden-Minton, J. (1995) Multilevel diagnostics for mixed
+  and hierarchical linear models. University of California
+  Los Angeles.
+}
+\seealso{
+  \code{\link{HLMresid}}
+}
+\keyword{models}
+\keyword{regression}
 

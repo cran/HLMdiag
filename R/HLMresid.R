@@ -1,87 +1,151 @@
-#' Calculating residuals from two-level HLMs
+#' Calculating residuals from HLMs
 #'
 #' \code{HLMresid} is a function that extracts residuals
-#' from two-level mixed/hierarchical linear models fit
-#' using \code{lmer}. That is, it is a function that
-#' will extract residuals from \code{mer} objects
-#' in a unified framework.
+#' from a hierarchical linear model fit
+#' using \code{lmer}. That is, it is a unified framework that
+#' extracts/calculates residuals from \code{mer} objects.
 #' 
-#' This function can extract residuals from either
-#' level of the model, and can extract residuals
-#' estimated using least squares (LS), Empirical 
-#' Bayes (EB), or both. This unified framework
+#' This function extracts residuals from the model, 
+#' and can extract residuals
+#' estimated using least squares (LS) or Empirical 
+#' Bayes (EB). This unified framework
 #' enables the analyst to more easily conduct
 #' an upward residual analysis during model
-#' exploration or checking.
+#' exploration/checking.
 #'
 #' @param object an object of class \code{mer}.
-#' @param level specification of the residual of interest.
-#' @param how the residuals should be estimated; default is \code{"all"}.
-#' @param if \code{type = "all"} or \code{"LS"}, a linear formula
-#'  used by \code{adjust_lmList} (y ~ x1 + ... + xn | g where g is a grouping factor)
-#'  must be specified.
-#' @param data optional argument giving the data frame used for LS residuals. This
-#'  is used mainly for when dealing with simulations.
-HLMresid <- function(object, level = c(1, 2), type = c("both", "LS", "EB", "marginal"), sim = NULL, semi.standardize = TRUE){
-	type <- match.arg(type)
-	if(is.null(data)){data <- object@frame}
+#' @param level which residuals should be extracted: 1 for within-group (case-level)
+#' residuals, the name of a grouping factor (as defined in \code{flist} of the 
+#' \code{mer} object) for between-group residuals, or \code{marginal}.
+#' @param type how are the residuals predicted: either \code{"EB"} or \code{"LS"}
+#'   (the default is \code{"EB"}). 
+#' @param sim optional argument giving the data frame used for LS residuals. This
+#'  is used mainly for dealing with simulations.
+#' @param standardize if \code{standardize = TRUE} the standardized
+#' residuals will be returned; if \code{standardize = "semi"} then
+#' the semi-standardized level-1 residuals will be returned. Note that
+#' for higher-level residuals of \code{type = "LS"},  \code{standardize = TRUE} 
+#' does not result in standardized residuals as they have not been implemented.
+#' @details The \code{HLMresid} function provides a wrapper that will extract
+#' residuals from a fitted \code{mer} object. The function provides access to 
+#' residual quantities already made available by the functions \code{resid} and
+#' \code{ranef}, but adds additional functionality. Below is a list of types of
+#' residuals that can be extracted.
+#' \describe{
+#' \item{raw level-1 residuals}{These are equivalent to the residuals extracted
+#' by \code{resid} if \code{level = 1}, \code{type = "EB"}, and 
+#' \code{standardize = FALSE} is specified. 
+#' You can also specify \code{type = "LS"} for LS residuals
+#' that are not equivalent to those from \code{resid}.}
+#' \item{standardized level-1 residuals}{Specify \code{level = 1}, and 
+#' \code{standardize = TRUE}. This works with both \code{type = "EB"} or \code{"LS"}.}
+#' \item{semi-standardized level-1 residuals}{Specify \code{level = 1}, \code{type = "LS"} and 
+#' \code{standardize = "semi"}.}
+#' \item{raw group level residuals}{These are equivalent to extracting the 
+#' predicted random effects for a given group using \code{ranef}. Set 
+#' \code{level} to a grouping factor name and \code{type = "EB"}. \code{type = "LS"}
+#' can also be specified, though this is less common.}
+#' \item{standardized group level residuals}{Set 
+#' \code{level} to a grouping factor name, \code{type = "EB"}, and 
+#' \code{standardized = TRUE}. This will not produce standardized residuals for
+#' \code{type = "LS"}.}
+#' \item{marginal residuals}{The marginal residuals can be obtained by setting
+#' \code{level = "marginal"}. Only \code{type = "EB"} is implemented.}
+#' \item{cholesky residuals}{These are essentially standardized marginal residuals.
+#' To obtain cholesky residuals set \code{level = "marginal"}, \code{type = "EB"},
+#' and \code{standardize = TRUE}.}
+#' }
+#' Note that \code{standardize = "semi"} is only implemented for level-1 LS residuals.
+#' @author Adam Loy \email{aloy@@istate.edu}
+#' @export
+#' @keywords models regression
+#' @seealso \code{\link{LSresids}}, \code{\link{resid}}, \code{\link{ranef}}
+#' @references 
+#' Hilden-Minton, J. (1995) Multilevel diagnostics for mixed and hierarchical 
+#' linear models. University of California Los Angeles.
+#' 
+#' Houseman, E. A., Ryan, L. M., & Coull, B. A. (2004) 
+#' Cholesky Residuals for Assessing Normal Errors in a Linear 
+#' Model With Correlated Outcomes. 
+#' \emph{Journal of the American Statistical Association}, \bold{99}(466), 383--394.
+#' @examples
+#' data(sleepstudy, package = "lme4")
+#' fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+#' 
+#' # level-1 residuals
+#' all.equal(HLMresid(object = fm1, level = 1, type = "EB"), resid(fm1)) ## EB
+#' r1LS <- HLMresid(object = fm1, level = 1, type = "LS") ## raw LS resids
+#' head(r1LS)
+#' r1LS.std <- HLMresid(object = fm1, level = 1, type = "LS", standardize = TRUE) ## std. LS resids
+#' head(r1LS.std)
+#' 
+#' # level-2 residuals
+#' all.equal(r2EB <- HLMresid(object = fm1, level = "Subject", type = "EB"), ranef(fm1)[["Subject"]])
+#' r2EB.std <- HLMresid(object = fm1, level = "Subject", type = "EB", standardize = TRUE)
+#' head(r2EB)
+#' head(r2EB.std)
+#' 
+#' # marginal residuals
+#' mr <- HLMresid(object = fm1, level = "marginal")
+#' cholr <- HLMresid(object = fm1, level = "marginal", standardize = TRUE) # Cholesky residuals
+HLMresid <- function(object, level, type = "EB", sim = NULL, standardize = FALSE){
+  if(!is(object, "mer")) stop("object must be of class 'mer'")
+  if(!level %in% c(1, names(object@flist), "marginal")) {
+    stop("level can only be 1, a grouping factor from the fitted model,
+         or marginal.")
+  }
+  if(!type %in% c("EB", "LS")) stop("type must be either 'EB' or 'LS'.")
+  if(!is.null(standardize) && !standardize %in% c(FALSE, TRUE, "semi")) {
+    stop("standardize can only be specified to be logical or 'semi'.")
+  }
 	
-	if(type == "marginal"){
-		return(object@y - object@X %*% fixef(object))
+	if(level == "marginal"){
+		mr <- object@y - getME(object, "X") %*% fixef(object)
+    if(standardize == TRUE){
+      sig0 <- sigma(object)
+      ZDZt <- sig0^2 * crossprod( getME(object, "A") )
+      n    <- nrow(ZDZt)
+      
+      R      <- Diagonal( n = n, x = sig0^2 )
+      V      <- Diagonal(n) + ZDZt
+      V.chol <- chol( V )
+      Vinv   <- chol2inv( V.chol )
+      
+      Lt <- chol(Vinv)
+      
+      return(as.numeric(Lt %*% mr))
+      
+    } else{
+      return(as.numeric(mr))
+    }
 	}
 	
-	if(1 %in% level){
-		if(type != "EB"){
-			LS1 <- LSresids(object = object, level = 1, sim = sim, semi.standardize = semi.standardize)
+	if(level == 1){
+		if(type == "LS"){
+			return(LSresids(object = object, level = level, sim = sim, 
+                      standardize = standardize))
 		}
-		if(type != "LS"){
-			EB1 <- resid(object)
-		}
-	}
-	
-	if(2 %in% level){
-		if(type != "EB"){
-			LS2 <- LSresids(object = object, level = 2, sim = sim, semi.standardize = semi.standardize)
-		}
-		if(type != "LS"){
-			EB2 <- ranef(object)[[1]]
+		if(type == "EB"){
+			if(standardize == TRUE) {
+			  return( resid(object) / sigma(object) )
+			} else{
+			  return(resid(object))
+			}
 		}
 	}
 	
-	level.1 <- level.2 <- NULL
-
-	if(type == "EB"){
-		if(1 %in% level){
-			level.1 <- cbind(EB.resid = EB1)
+	if(level %in% names(object@flist)){
+		if(type == "LS"){
+			return(LSresids(object = object, level = level, sim = sim, standardize = standardize))
 		}
-		if(2 %in% level){
-			level.2 <- cbind(EB = EB2)
-		}	
-	}
-	
-	if(type == "LS"){
-		if(1 %in% level){
-			level.1 <- LS1
-		}
-		if(2 %in% level){
-			level.2 <- cbind(LS = LS2)
+		if(type == "EB"){
+      if(standardize == TRUE) {
+        re <- ranef(object)[[level]]
+        se.re <- se.ranef(object)[[level]]
+        return(re / se.re)
+      } else{
+        return(ranef(object)[[level]])
+      }
 		}
 	}
-	
-	if(type == "both"){
-		if(1 %in% level){
-			level.1 <- cbind(LS1, EB.resid = EB1)
-		}
-		if(2 %in% level){
-			level.2 <- cbind(LS2, EB2)
-			nc <- dim(level.2)[2]/2
-			colnames(level.2) <- paste(rep(c("LS", "EB"), each = nc), colnames(level.2), sep = ".")
-		}
-	}
-	
-	res <- list(level.1 = level.1, level.2 = level.2)
-	
-	if(sum(level %in% c(1,2)) == 2){ return(res) }
-	else{return(res[[level]])}
 }
-

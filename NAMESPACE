@@ -1,30 +1,46 @@
-import(methods)
+useDynLib(HLMdiag)
+
+import(Matrix)
+import(lme4)
+## import(methods)
 import(plyr)
 import(reshape2)
-import(MASS)
+importFrom(stats, cooks.distance, covratio)
 importFrom(stats4, coef, confint, plot)
+importFrom(MASS, rlm)
 
-export("adjust_lmList",
-	"case_delete",
-	"compare_eb_ls",
-	"cooksd_hlm",
-	"covratio_hlm",
-	"covtrace_hlm",
-	"diagnostics",
-	"dotplot_diag",
-	"ggplot_qqnorm",
-	"ggplot_ppnorm",
-	"group_qqnorm",
-	"HLMresid",
-	"LSresids",
-	"mdffits_hlm",
-	"ppnormBand",
-	"rvc",
-	".sampleQuantiles",
-	".parse_formula",
-	".parse_f"
-)
+export(adjust_lmList)
+export(compare_eb_ls)
+export(HLMresid)
+export(LSresids)
+export(case_delete)
+export(covratio)
+export(covratio.default)
+export(covtrace)
+export(covtrace.default)
+export(diagnostics)
+export(dotplot_diag)
+export(group_qqnorm)
+export(ggplot_qqnorm)
+export(leverage)
+export(leverage.default)
+export(mdffits)
+export(mdffits.default)
+export(rvc)
+export(rvc.default)
+export(varcomp.mer)
 
 exportClasses("adjust_lmList")
+exportMethods("coef", "confint", "formula", "plot", "show")
 
-exportMethods("coef", "confint", "show", "plot")
+S3method(cooks.distance, case_delete)
+S3method(cooks.distance, mer)
+S3method(covratio, case_delete)
+S3method(covratio, mer)
+S3method(covtrace, case_delete)
+S3method(covtrace, mer)
+S3method(leverage, mer)
+S3method(mdffits, case_delete)
+S3method(mdffits ,mer)
+S3method(rvc, case_delete)
+S3method(rvc, mer)

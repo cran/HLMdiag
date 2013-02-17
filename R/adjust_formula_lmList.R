@@ -1,16 +1,17 @@
-#' Adjusting formula for lmList
-#'
-#' When dealing with nested data, sometimes a factor will only take on one level
-#' within a group. This causes an error, since a factor must have 2 or more levels
-#' to be included as a predictor within a formula for a linear model. When a
-#' factor takes on only one level, the effect of that factor can then be included
-#' in the intercept of the model. This function takes a formula for use with \code{lmList}
-#' and will make the necessary adjustments to avoid errors while fitting the separate LS models. 
-#'
-#' @param formula a linear formula that is used by \code{lmList()} e.g. y ~ x1 + x2 + ... + xn | g
-#' @param data the model frame from the model fit by \code{lmer()}
-#' @return a list containing the adjusted formulas
-#' @author Adam Loy \email{aloy@@iastate.edu}
+# Adjusting formula for lmList
+#
+# When dealing with nested data, sometimes a factor will only take on one level
+# within a group. This causes an error, since a factor must have 2 or more levels
+# to be included as a predictor within a formula for a linear model. When a
+# factor takes on only one level, the effect of that factor can then be included
+# in the intercept of the model. This function takes a formula for use with \code{lmList}
+# and will make the necessary adjustments to avoid errors while fitting the separate LS models. 
+#
+# @param formula a linear formula that is used by \code{lmList()} e.g. y ~ x1 + x2 + ... + xn | g
+# @param data the model frame from the model fit by \code{lmer()}
+# @return a list containing the adjusted formulas
+# @author Adam Loy \email{aloy@@iastate.edu}
+# @keywords models regression
 problem_factor_groups <- function(formula, data){
 	form <- formula(formula)
 	model_frame <- data
@@ -42,9 +43,9 @@ problem_factor_groups <- function(formula, data){
 	return(one_level_factor)
 }
 
-#----------------------------
+
 subbars <- function(term)
-### Substitute the '+' function for the '|' function (from lmer)
+#@ Substitute the '+' function for the '|' function (from lmer)
 {
     if (is.name(term) || !is.language(term)) return(term)
     if (length(term) == 2) {
@@ -58,7 +59,7 @@ subbars <- function(term)
     term
 }
 
-#----------------------------
+
 adjust_formula_lmList <- function(formula, data){
 	lm_form <- formula(formula)
 	lm_form[[3]] <- lm_form[[3]][[2]]
@@ -116,7 +117,7 @@ adjust_formula_lmList <- function(formula, data){
 	return(formula_list)
 }
 
-#----------------------------
+
 pooledSD <- function(x, ...)
 {
     stopifnot(is(x, "adjust_lmList"))
@@ -137,7 +138,34 @@ pooledSD <- function(x, ...)
     val
 }
 
-#----------------------------
+
+
+
+#'Fitting Common Models via \code{lm}
+#'
+#'Separate linear models are fit via \code{lm} similar to \code{lmList},
+#'however, \code{adjust_lmList} can handle models where a factor takes only one
+#'level within a group. In this case, the \code{formula} is updated eliminating
+#'the offending factors from the formula for that group as the effect is
+#'absorbed into the intercept.
+#'
+#'
+#'@aliases adjust_lmList adjust_lmList,formula,data.frame-method
+#'@keywords models regression
+#'@param formula a linear formula such as that used by \code{lmList}, e.g.
+#'\code{y ~ x1 + ... + xn | g}, where \code{g} is a grouping factor.
+#'@param data a data frame containing the variables in the model.
+#'@param pool a logical value that indicates whether the pooled standard
+#'deviation/error should be used.
+#'@seealso \code{\link[lme4]{lmList}, \link[stats]{lm}}
+#'@references Douglas Bates, Martin Maechler and Ben Bolker (2012). lme4:
+#'Linear mixed-effects models using S4 classes. R package version 0.999999-0.
+#'@examples
+#'
+#' data(Exam, package = 'mlmRev')
+#' sepLM <- adjust_lmList(normexam ~ standLRT + sex + schgend | school, data = Exam)
+#' confint(sepLM)
+#'
 adjust_lmList <- function(formula, data, pool){
 	options(show.error.messages = FALSE)
 	lmList_result <- try(lmList(formula = formula, data = data), silent = TRUE)
@@ -168,13 +196,12 @@ adjust_lmList <- function(formula, data, pool){
 	lmList_result
 }
 
-#----------------------------
+
 setClass("adjust_lmList", representation(call = "call", pool = "logical"), contains = "list")
 
-#----------------------------
 setClass("adjust_lmList.confint", contains = "array")
 
-#----------------------------
+
 #' @export
 setMethod("adjust_lmList", signature(formula = "formula", data = "data.frame"),
 	function(formula, data, pool){
@@ -223,7 +250,7 @@ setMethod("coef", signature(object = "adjust_lmList"),
 			coefs
 	})
 
-#----------------------------
+
 #' @export
 setMethod("show", signature(object = "adjust_lmList"), 
 	function(object){
@@ -233,7 +260,7 @@ setMethod("show", signature(object = "adjust_lmList"),
 	})
 	
 
-#----------------------------
+
 #' @export
 setMethod("confint", signature(object = "adjust_lmList"),
 	function(object, parm, level = 0.95, pool = NULL, ...){
@@ -271,24 +298,24 @@ setMethod("confint", signature(object = "adjust_lmList"),
 	}, valueClass = "adjust_lmList.confint"
 )
 
-#----------------------------
+
 #' @export
 setMethod("plot", signature(x = "adjust_lmList.confint"),
 	function(x, y, ...){
 		stopifnot(require("ggplot2"))
+    group <- intervals <- NULL # Make codetools happy
 		cis <- as(x, "array")
 		df <- adply(cis, c(1, 2, 3), identity)
 		colnames(df) <- c("group", "end", "what", "intervals")
 		p <- ggplot(df, aes(x = group, y = intervals))
 		p + geom_line() +
 			geom_errorbar(aes(ymin = intervals, ymax = intervals)) + 
-			facet_wrap( ~ what, nrow = 1, scale = "free") + 
-			coord_flip() + ylab(NULL)
+			facet_wrap( ~ what, nrow = 1, scales = "free") #+ 
+# 			coord_flip() + ylab(NULL)
 	}
 )
 
-#----------------------------
-#' @export
 
+#' @export
 setMethod("formula", signature(x = "adjust_lmList"),
           function(x, ...) x@call[["formula"]])
