@@ -1,6 +1,6 @@
-75d12179a1eb5406fb59876d8194cc18 *DESCRIPTION
+4ce98e8dbe7a3cf534d8190330a69f34 *DESCRIPTION
 9664a305a92c7026508f1fd15e9642b0 *NAMESPACE
-e285b54f2d3f7be0b166ee1e8f134a9a *NEWS
+b042f812d8080bb521275ebb6f3f042e *NEWS
 00846fd82709242f7c0cee90228c6e1c *R/HLMresid.R
 50f954edd2f7cf8b6ba65c5b57bfcce2 *R/LSresids.R
 19ca4e6e87ec251766f9845731f3020f *R/adjust_formula_lmList.R
@@ -11,7 +11,7 @@ aaddbd862028e5358563a6a23cd291fa *R/group_level_residual_functions.R
 482a4051d66c6990fa1021df16605ebd *R/identification.R
 25d4a1fc06acb45316b2b52f719c7d19 *R/influence_functions.R
 5e44e854562c23699e2fd3290248529b *R/plot_functions.R
-8b2b505891d8da5a2c2a7b26f2c8d45f *R/quantile_functions.R
+2c41d631ec1fed21ba0f062da3dc3f38 *R/quantile_functions.R
 da49ce7f665dff8ff2fb93c9e82fce68 *R/utility_functions.R
 5e928692746e171d5e389f4ac3b30402 *README.md
 5ebea90681601c4a86c770c212855632 *data/wages.RData
