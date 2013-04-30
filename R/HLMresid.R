@@ -1,9 +1,23 @@
+#' @export
+HLMresid <- function(object, ...){
+  UseMethod("HLMresid", object)
+}
+
+#' @export
+#' @rdname HLMresid.mer
+#' @method HLMresid default
+#' @S3method HLMresid default
+HLMresid.default <- function(object, ...){
+  stop(paste("there is no HLMresid() method for objects of class",
+             paste(class(object), collapse=", ")))
+}
+
 #' Calculating residuals from HLMs
 #'
 #' \code{HLMresid} is a function that extracts residuals
 #' from a hierarchical linear model fit
 #' using \code{lmer}. That is, it is a unified framework that
-#' extracts/calculates residuals from \code{mer} objects.
+#' extracts/calculates residuals from \code{mer} or \code{lmerMod} objects.
 #' 
 #' This function extracts residuals from the model, 
 #' and can extract residuals
@@ -13,7 +27,11 @@
 #' an upward residual analysis during model
 #' exploration/checking.
 #'
-#' @param object an object of class \code{mer}.
+#' @export
+#' @method HLMresid mer
+#' @S3method HLMresid mer
+#' @aliases HLMresid
+#' @param object an object of class \code{mer} or \code{lmerMod}.
 #' @param level which residuals should be extracted: 1 for within-group (case-level)
 #' residuals, the name of a grouping factor (as defined in \code{flist} of the 
 #' \code{mer} object) for between-group residuals, or \code{marginal}.
@@ -26,8 +44,10 @@
 #' the semi-standardized level-1 residuals will be returned. Note that
 #' for higher-level residuals of \code{type = "LS"},  \code{standardize = TRUE} 
 #' does not result in standardized residuals as they have not been implemented.
+#' @param ... do not use
 #' @details The \code{HLMresid} function provides a wrapper that will extract
-#' residuals from a fitted \code{mer} object. The function provides access to 
+#' residuals from a fitted \code{mer} or \code{lmerMod} object. 
+#' The function provides access to 
 #' residual quantities already made available by the functions \code{resid} and
 #' \code{ranef}, but adds additional functionality. Below is a list of types of
 #' residuals that can be extracted.
@@ -88,8 +108,7 @@
 #' # marginal residuals
 #' mr <- HLMresid(object = fm1, level = "marginal")
 #' cholr <- HLMresid(object = fm1, level = "marginal", standardize = TRUE) # Cholesky residuals
-HLMresid <- function(object, level, type = "EB", sim = NULL, standardize = FALSE){
-  if(!is(object, "mer")) stop("object must be of class 'mer'")
+HLMresid.mer <- function(object, level, type = "EB", sim = NULL, standardize = FALSE, ...){
   if(!level %in% c(1, names(object@flist), "marginal")) {
     stop("level can only be 1, a grouping factor from the fitted model,
          or marginal.")
@@ -127,7 +146,11 @@ HLMresid <- function(object, level, type = "EB", sim = NULL, standardize = FALSE
 		}
 		if(type == "EB"){
 			if(standardize == TRUE) {
-			  return( resid(object) / sigma(object) )
+        
+        mats <- .mer_matrices(object)
+        p_diag <- diag(mats$P)
+        
+			  return( resid(object) / ( sigma(object) * sqrt(p_diag) ) )
 			} else{
 			  return(resid(object))
 			}
@@ -149,3 +172,74 @@ HLMresid <- function(object, level, type = "EB", sim = NULL, standardize = FALSE
 		}
 	}
 }
+
+
+#' @export
+#' @rdname HLMresid.mer
+#' @method HLMresid lmerMod
+#' @S3method HLMresid lmerMod
+HLMresid.lmerMod <- function(object, level, type = "EB", sim = NULL, 
+                             standardize = FALSE, ...){
+  if(!level %in% c(1, names(object@flist), "marginal")) {
+    stop("level can only be 1, a grouping factor from the fitted model,
+         or marginal.")
+  }
+  if(!type %in% c("EB", "LS")) stop("type must be either 'EB' or 'LS'.")
+  if(!is.null(standardize) && !standardize %in% c(FALSE, TRUE, "semi")) {
+    stop("standardize can only be specified to be logical or 'semi'.")
+  }
+  
+  if(level == "marginal"){
+    mr <- object@resp$y - getME(object, "X") %*% fixef(object)
+    if(standardize == TRUE){
+      sig0 <- sigma(object)
+      ZDZt <- sig0^2 * crossprod( getME(object, "A") )
+      n    <- nrow(ZDZt)
+      
+      R      <- Diagonal( n = n, x = sig0^2 )
+      V      <- Diagonal(n) + ZDZt
+      V.chol <- chol( V )
+      Vinv   <- chol2inv( V.chol )
+      
+      Lt <- chol(Vinv)
+      
+      return(as.numeric(Lt %*% mr))
+      
+    } else{
+      return(as.numeric(mr))
+    }
+  }
+  
+  if(level == 1){
+    if(type == "LS"){
+      return(LSresids(object = object, level = level, sim = sim, 
+                      standardize = standardize))
+    }
+    if(type == "EB"){
+      if(standardize == TRUE) {
+        
+        mats <- .lmerMod_matrices(object)
+        p_diag <- diag(mats$P)
+        
+        return( resid(object) / ( sigma(object) * sqrt(p_diag) ) )
+      } else{
+        return(resid(object))
+      }
+    }
+  }
+  
+  if(level %in% names(object@flist)){
+    if(type == "LS"){
+      return(LSresids(object = object, level = level, sim = sim, standardize = standardize))
+    }
+    if(type == "EB"){
+      if(standardize == TRUE) {
+        re <- ranef(object)[[level]]
+        se.re <- se.ranef(object)[[level]]
+        return(re / se.re)
+      } else{
+        return(ranef(object)[[level]])
+      }
+    }
+  }
+  }

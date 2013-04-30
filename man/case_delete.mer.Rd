@@ -1,9 +1,19 @@
-\name{case_delete}
+\name{case_delete.default}
 \alias{case_delete}
-\title{Case Deletion for \code{mer} objects}
+\alias{case_delete.default}
+\alias{case_delete.lmerMod}
+\alias{case_delete.mer}
+\title{Case Deletion for \code{mer}/\code{lmerMod} objects}
 \usage{
-  case_delete(model, group = NULL,
-    type = c("both", "fixef", "varcomp"), delete = NULL)
+  \method{case_delete}{default} (model, ...)
+
+  \method{case_delete}{mer} (model, group = NULL,
+    type = c("both", "fixef", "varcomp"), delete = NULL,
+    ...)
+
+  \method{case_delete}{lmerMod} (model, group = NULL,
+    type = c("both", "fixef", "varcomp"), delete = NULL,
+    ...)
 }
 \arguments{
   \item{model}{the original hierarchical model fit using
@@ -24,6 +34,8 @@
   \code{group} parameter must also be specified.  If
   \code{delete = NULL} then all cases are iteratively
   deleted.}
+
+  \item{...}{do not use}
 }
 \value{
   a list with the following compontents: \describe{

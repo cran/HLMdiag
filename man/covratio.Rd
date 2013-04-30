@@ -1,9 +1,11 @@
 \name{covratio.default}
 \alias{covratio}
 \alias{covratio.default}
+\alias{covratio.lmerMod}
 \alias{covratio.mer}
 \alias{covtrace}
 \alias{covtrace.default}
+\alias{covtrace.lmerMod}
 \alias{covtrace.mer}
 \title{Influence on precision of fixed effects in HLMs}
 \usage{
@@ -14,11 +16,18 @@
   \method{covratio}{mer} (object, group = NULL,
     delete = NULL, ...)
 
+  \method{covratio}{lmerMod} (object, group = NULL,
+    delete = NULL, ...)
+
   \method{covtrace}{mer} (object, group = NULL,
+    delete = NULL, ...)
+
+  \method{covtrace}{lmerMod} (object, group = NULL,
     delete = NULL, ...)
 }
 \arguments{
-  \item{object}{fitted object of class \code{mer}}
+  \item{object}{fitted object of class \code{mer} or
+  \code{lmerMod}}
 
   \item{group}{variable used to define the group for which
   cases will be deleted.  If \code{group = NULL}, then

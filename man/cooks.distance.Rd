@@ -1,8 +1,10 @@
 \name{mdffits.default}
 \alias{cooks.distance}
+\alias{cooks.distance.lmerMod}
 \alias{cooks.distance.mer}
 \alias{mdffits}
 \alias{mdffits.default}
+\alias{mdffits.lmerMod}
 \alias{mdffits.mer}
 \title{Influence on fixed effects of HLMs}
 \usage{
@@ -11,11 +13,18 @@
   \method{cooks.distance}{mer} (model, group = NULL,
     delete = NULL, ...)
 
+  \method{cooks.distance}{lmerMod} (model, group = NULL,
+    delete = NULL, ...)
+
   \method{mdffits}{mer} (object, group = NULL,
+    delete = NULL, ...)
+
+  \method{mdffits}{lmerMod} (object, group = NULL,
     delete = NULL, ...)
 }
 \arguments{
-  \item{model}{fitted model of class \code{mer}}
+  \item{model}{fitted model of class \code{mer} or
+  \code{lmerMod}}
 
   \item{group}{variable used to define the group for which
   cases will be deleted.  If \code{group = NULL}, then
@@ -29,7 +38,8 @@
 
   \item{...}{do not use}
 
-  \item{object}{fitted object of class \code{mer}}
+  \item{object}{fitted object of class \code{mer} or
+  \code{lmerMod}}
 }
 \value{
   Both functions return a numeric vector (or single value

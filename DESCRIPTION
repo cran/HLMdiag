@@ -1,8 +1,8 @@
 Package: HLMdiag
 Type: Package
 Title: Diagnostic tools for hierarchical (multilevel) linear models
-Version: 0.2.1
-Date: 2013-3-25
+Version: 0.2.2
+Date: 2013-4-30
 Author: Adam Loy <aloy@iastate.edu>
 Maintainer: Adam Loy <aloy@iastate.edu>
 Description: A suite of diagnostic tools for hierarchical (multilevel)
@@ -23,7 +23,7 @@ Collate: 'diagnostic_functions.R' 'group_level_residual_functions.R'
         'adjust_formula_lmList.R' 'case_delete.R' 'LSresids.R'
         'HLMresid.R' 'help.R' 'influence_functions.R'
         'utility_functions.R'
-Packaged: 2013-03-26 02:02:15 UTC; adam
+Packaged: 2013-04-30 20:25:57 UTC; adam
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2013-03-26 07:42:46
+Date/Publication: 2013-05-01 07:47:50
