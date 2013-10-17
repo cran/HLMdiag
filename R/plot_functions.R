@@ -22,7 +22,7 @@
 #' @param modify specifies the \code{geom} to be used to produce a 
 #' space-saving modification: either \code{"dotplot"} or \code{"boxplot"}
 #' @param ... other arguments to be passed to \code{qplot()}
-#' @author Adam Loy \email{aloy@@istate.edu}
+#' @author Adam Loy \email{loyad01@@gmail.com}
 #' @examples 
 #' data(sleepstudy, package = 'lme4')
 #' fm <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
@@ -137,8 +137,7 @@ dotplot_diag <- function(x, index, data, cutoff,
                       inherit.aes = FALSE)
         }
 
-		ver <- as.numeric_version(packageVersion("ggplot2"))
-		if(ver >= as.numeric_version("0.9.2")) {
+
 #         	p + geom_point(aes(x = index[which(extreme == FALSE)],
 #         	               y = x[which(extreme == FALSE)]), 
 #                          colour = I("blue"), inherit.aes = FALSE) + 
@@ -148,18 +147,6 @@ dotplot_diag <- function(x, index, data, cutoff,
 		  p + geom_hline(aes(yintercept = cutoff), colour=I("red")) +
 		    theme(legend.position = "none") +
 		    coord_flip()
-		  
-      	} else{
-#         	p + geom_point(aes(x = index[which(extreme == FALSE)],
-#         	               y = x[which(extreme == FALSE)]), 
-#                          colour = I("blue"), inherit.aes = FALSE) + 
-#           		geom_hline(aes(yintercept = cutoff), colour=I("red")) +
-#               	opts(legend.position = "none") +
-#                 coord_flip()      			
-          p + geom_hline(aes(yintercept = cutoff), colour=I("red")) +
-            opts(legend.position = "none") + 
-            coord_flip()
-      	}
     }
 
       else{
@@ -199,8 +186,6 @@ dotplot_diag <- function(x, index, data, cutoff,
           } 
         
 
-		    ver <- as.numeric_version(packageVersion("ggplot2"))
-		    if(ver >= as.numeric_version("0.9.2")) {
         	p + 
 #             geom_point(aes(x = index[which(extreme == FALSE)],
 #                              y = x[which(extreme == FALSE)]), 
@@ -209,16 +194,6 @@ dotplot_diag <- function(x, index, data, cutoff,
             	geom_hline(aes(yintercept = cutoff[2]), colour=I("red")) + 
                 theme(legend.position = "none") +
                 coord_flip()	
-        } else{
-        	p + 
-#             geom_point(aes(x = index[which(extreme == FALSE)],
-#         	               y = x[which(extreme == FALSE)]), 
-#                          colour = I("blue"), inherit.aes = FALSE) + 
-          		geom_hline(aes(yintercept = cutoff[1]), colour=I("red")) + 
-            	geom_hline(aes(yintercept = cutoff[2]), colour=I("red")) + 
-                opts(legend.position = "none") +
-                coord_flip()		        	
-       }
         
       }
         

@@ -1,8 +1,11 @@
 useDynLib(HLMdiag)
 
+importFrom(ggplot2, qplot, geom_boxplot, geom_point, theme, coord_flip, 
+           geom_hline, geom_text, geom_abline, aes, ggplot, geom_line, 
+          geom_errorbar, facet_wrap, geom_smooth, xlab, ylab)
 import(Matrix)
 import(lme4)
-## import(methods)
+import(methods)
 import(plyr)
 import(reshape2)
 importFrom(stats, cooks.distance, covratio)
@@ -32,10 +35,14 @@ export(mdffits.default)
 export(rvc)
 export(rvc.default)
 export(varcomp.mer)
+export(rotate_ranef)
+export(rotate_ranef.default)
 
 exportClasses("adjust_lmList")
 exportMethods("coef", "confint", "plot", "show")
 
+S3method(rotate_ranef, mer)
+S3method(rotate_ranef, lmerMod)
 S3method(HLMresid, mer)
 S3method(HLMresid, lmerMod)
 S3method(LSresids, mer)
