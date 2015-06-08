@@ -1,3 +1,31 @@
+Version 0.3.0
+=============
+DEVELOPMENT
+
+* Influence diagnostics in HLMdiag 0.3.0 are available for two-level models fit
+using the `lmer` function in lme4` or the `lme` function in `nlme`. I am still
+working to implement these methods for higher-level models using `lme`.
+* HLMdiag no longer loads lme4 automatically (see above for the reason).
+
+NEW FEATURES
+
+* The `rotate_ranef` function has been added. This function rotates the random 
+effects in an effort to find the least confounded residuals for distributional 
+assessment.
+
+BUG FIXES
+* `LSresids` was fixed for an issue with the order of the resulting data frame.
+* `case_delete` was fixed so that numeric group labels work properly, which fixes an issue
+with `rvc`.
+* Fixed an issue with `group_qqnorm`, by using `ppoints` rather than `.SampleQuantiles`.
+* Fixed an issue with `case_delete.lmerMod`, to use the `getME()` function to extract `n`.
+* A bug in the calculation of the Cholesky residuals was fixed (thanks to Harry Hiemstra for reporting the bug and the fix)
+
+
+Version 0.2.5
+=============
+* Fixed a compatibility issue with Rcpp
+
 Version 0.2.4
 =============
 * Added citation for the JSS paper
