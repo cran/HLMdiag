@@ -1,6 +1,6 @@
-a689b95a8ca3362d48b0ee10769e9b1a *DESCRIPTION
-af8fb15bc7b97a766219538e07104796 *NAMESPACE
-91c3aa91002c6877cfb8caafe75ff61d *NEWS
+d34d89d308c8537de862df5f66dfff09 *DESCRIPTION
+fd60d18879932c741f149617e9bb4011 *NAMESPACE
+2a225d7045764a3de455c62d16f86108 *NEWS
 98bbd05327783ca4f95b4ff3ea255325 *R/HLMresid.R
 393dd9c0930dccceb437b8220e7edc48 *R/LSresids.R
 7c2759202a31b501102265b76dd0cc53 *R/adjust_formula_lmList.R
@@ -8,15 +8,15 @@ af8fb15bc7b97a766219538e07104796 *NAMESPACE
 ed1b0d51fbc3953e711b3195135e0aa5 *R/autism.R
 e046d3321abf3740a59a0f409542cc74 *R/case_delete.R
 f67df155ee5248481ab4f33400d3b8fb *R/diagnostic_functions.R
-983411d9bd5449a4a24ff09e1813ae5d *R/group_level_residual_functions.R
+618a4ba0303f075dfce35cc82fc172db *R/group_level_residual_functions.R
 95102b1b6dc5ed2e2d87dd9fe3410371 *R/help.R
 22b766267f671f83c9c70437f98c3688 *R/identification.R
 a3e537be04e71666c05a574b176c2860 *R/influence_functions.R
-0768d8cd8dc7ea90d49194b1b8032c1e *R/plot_functions.R
+089eca413a79e9514804452240c9a117 *R/plot_functions.R
 ce698aa94f3f010c718b4e0e63ea919c *R/quantile_functions.R
 ff29d7f470fcda5bd212da30f716e42e *R/radon.R
 a9709b854b8b8b394efea5872f8056f8 *R/rotate_ranefs.R
-db4bab4708723a0d4d592d072498b53f *R/utility_functions.R
+539def2619ec7bcb7a7a66baf1d21818 *R/utility_functions.R
 6c06ec900384c97395e3ab31e0ec5c87 *README.md
 b4d8014347361b425d2b9a39b4df6fbc *data/ahd.RData
 25e93886ae9107dd8056462cc0c59f58 *data/autism.RData
@@ -34,7 +34,7 @@ a7946d76b4b988250a8c51ecb4e1f73e *man/case_delete.mer.Rd
 d91aebd549f949cba7fc196381b0d2cd *man/cooks.distance.Rd
 45afd3aeb3b81b213ac58df2bfd8e0b4 *man/covratio.Rd
 7adfbd1d63c8d86e05773ccce95c4bce *man/diagnostics.Rd
-a597f24272c6295986750ea6e726bd0b *man/dotplot_diag.Rd
+03e6e581f40a3431e8edcabf4da33ca6 *man/dotplot_diag.Rd
 cd7b26b0d9020c87fd2d881bd6f2f4a4 *man/ggplot_qqnorm.Rd
 d43b5a1ab6c4da7ca2deefdcfb71f6d5 *man/group_qqnorm.Rd
 44c6d068c8f6dcf4e83b719c47127ea8 *man/leverage.mer.Rd
