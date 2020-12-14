@@ -10,13 +10,13 @@
 #'@param identify the percentage of points to identify as unusual,
 #'\code{FALSE} if you do not want the points identified.
 #'@param silent logical: should the list of data frames used to make the plots
-#' be supressed.
+#' be suppressed.
 #'@param ... other arguments to be passed to \code{qplot()}
 #'@author Adam Loy \email{loyad01@@gmail.com}
 #'@export
 #'@examples
 #'
-#'wages.fm1 <- lmer(lnw ~ exper + (exper | id), data = wages)
+#'wages.fm1 <- lme4::lmer(lnw ~ exper + (exper | id), data = wages)
 #'wages.sepLM <- adjust_lmList(lnw ~ exper | id, data = wages)
 #'rancoef.eb <- coef(wages.fm1)$id
 #'rancoef.ols <- coef(wages.sepLM)

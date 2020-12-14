@@ -52,7 +52,7 @@ qqlineInfo <- function(x){
 #' Overlaying normal Q-Q plots
 #'
 #' This function will overlay multiple normal Q-Q plots on the same plot. This
-#' will be particulary useful when comparing the distribution between groups.
+#' will be particularly useful when comparing the distribution between groups.
 #' In this situation, significantly different slopes would indicate the normal 
 #' distributions for the groups do not share a common standard deviation.
 #'
@@ -69,6 +69,7 @@ qqlineInfo <- function(x){
 #' Hilden-Minton, J. A. (1995) 
 #' Mulilevel Diagnostics for Mixed and Hierarchical Linear Models,
 #' Ph.D. thesis, University of California Los Angeles. 
+#' @importFrom plyr .
 #' @export
 #' @keywords hplot
 group_qqnorm <- function(x, group, line = NULL, alpha_point = 1, alpha_line = 1, ...){
@@ -96,8 +97,8 @@ group_qqnorm <- function(x, group, line = NULL, alpha_point = 1, alpha_line = 1,
 	
 	# Defining the quantiles of interest for each group
 	group.quant <- data.frame(x = x, group = group)
-	group.quant <- ddply(group.quant, .(group), transform, p = ppoints(x), yp = sort(x))
-	group.quant <- ddply(group.quant, .(group), transform, theory = qnorm(p = p))
+	group.quant <- ddply(group.quant, plyr::.(group), transform, p = ppoints(x), yp = sort(x))
+	group.quant <- ddply(group.quant, plyr::.(group), transform, theory = qnorm(p = p))
 	
 	# Plotting
 	qq <- ggplot(data = group.quant, mapping = aes(x = theory, y = yp), ...) + 
