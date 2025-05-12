@@ -1,7 +1,7 @@
 Package: HLMdiag
 Type: Package
 Title: Diagnostic Tools for Hierarchical (Multilevel) Linear Models
-Version: 0.5.0
+Version: 0.5.1
 Authors@R: c(person("Adam", "Loy", email = "loyad01@gmail.com", role = c("cre", "aut")), person("Jaylin", "Lowe", role = "aut"), person("Jack", "Moran", role = "aut"))
 Maintainer: Adam Loy <loyad01@gmail.com>
 Description: A suite of diagnostic tools for hierarchical
@@ -31,12 +31,12 @@ Collate: 'diagnostic_functions.R' 'group_level_residual_functions.R'
 Encoding: UTF-8
 URL: https://github.com/aloy/HLMdiag
 BugReports: https://github.com/aloy/HLMdiag/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2021-05-01 14:27:35 UTC; aloy
+Packaged: 2025-05-12 22:56:38 UTC; aloy
 Author: Adam Loy [cre, aut],
   Jaylin Lowe [aut],
   Jack Moran [aut]
 Repository: CRAN
-Date/Publication: 2021-05-02 04:30:08 UTC
+Date/Publication: 2025-05-12 23:20:02 UTC

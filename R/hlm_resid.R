@@ -4,7 +4,7 @@ hlm_resid <- function(object, ...){
 }
 
 #' @export
-#' @rdname hlm_resid.lmerMod
+#' @rdname hlm_resid
 #' @method hlm_resid default
 hlm_resid.default <- function(object, ...){
   stop(paste("there is no hlm_resid() method for objects of class",
@@ -22,7 +22,7 @@ hlm_resid.default <- function(object, ...){
 #'
 #' @export
 #' @method hlm_resid lmerMod
-#' @aliases hlm_resid
+#' @name hlm_resid
 #' @param object an object of class \code{lmerMod} or \code{lme}.
 #' @param level which residuals should be extracted: 1 for within-group
 #'   (case-level) residuals, the name of a grouping factor for between-group
@@ -73,7 +73,7 @@ hlm_resid.default <- function(object, ...){
 #' Note that \code{standardize = "semi"} is only implemented for level-1 LS residuals.
 #' @author  Adam Loy \email{loyad01@@gmail.com}, Jack Moran, Jaylin Lowe
 #' @keywords models regression
-#' @seealso \code{\link{hlm_augment}}, \code{\link{resid}}, \code{\link{ranef}}
+#' @seealso \code{\link{hlm_augment}}, \code{\link{resid}}, \code{\link[lme4:ranef]{lme4::ranef}}
 #' @references 
 #' Hilden-Minton, J. (1995) Multilevel diagnostics for mixed and hierarchical 
 #' linear models. University of California Los Angeles.
@@ -114,7 +114,8 @@ hlm_resid.lmerMod <- function(object, level = 1, standardize = FALSE, include.ls
   if(!is.null(standardize) && !standardize %in% c(FALSE, TRUE, "semi")) {
     stop("standardize can only be specified to be logical or 'semi'.")
   }
-  if(class(attr(object@frame, "na.action")) == "exclude" && is.null(data) && level == 1){
+  if(inherits(attr(object@frame, "na.action"), "exclude") && is.null(data) && level == 1){
+  # if(class(attr(object@frame, "na.action")) == "exclude" && is.null(data) && level == 1){
     stop("Please provide the data frame used to fit the model. This is necessary when the na.action is set to na.exclude")
   }
   if(!is.null(getCall(object)$correlation)){
@@ -123,7 +124,7 @@ hlm_resid.lmerMod <- function(object, level = 1, standardize = FALSE, include.ls
   }
 
   # NA action
-  if(class(attr(object@frame, "na.action")) == "exclude"){         #if na.exclude
+  if(inherits(attr(object@frame, "na.action"), "exclude")){         #if na.exclude
     na.index <- which(!rownames(data) %in% rownames(object@frame))
     col.index <- which(colnames(data) %in% colnames(object@frame))
     data <- data[col.index]
@@ -169,7 +170,7 @@ hlm_resid.lmerMod <- function(object, level = 1, standardize = FALSE, include.ls
     mar.fitted  <- data.frame(.mar.fitted = predict(object, re.form = ~0))
     
     # NA Action
-    if(class(attr(object@frame, "na.action")) == "exclude"){
+    if(inherits(attr(object@frame, "na.action"), "exclude")){
       if(include.ls == TRUE){
         problem_dfs <- cbind(ls.resid, mar.resid)
         na.fix <- data.frame(LSR = rep(NA, length(na.index)), 
@@ -197,19 +198,21 @@ hlm_resid.lmerMod <- function(object, level = 1, standardize = FALSE, include.ls
     
     # Assemble Tibble
     if (include.ls == TRUE) {
-      return.tbl <- tibble::tibble("id" = as.numeric(rownames(data)),
+      return.tbl <- tibble::tibble(".id" = as.numeric(rownames(data)),
                                    data,
                                    eb.resid,
                                    eb.fitted,
                                    problem_dfs,
-                                   mar.fitted)
+                                   mar.fitted, 
+                                   .name_repair = "minimal")
     } else { 
-      return.tbl <- tibble::tibble("id" = as.numeric(rownames(data)),
+      return.tbl <- tibble::tibble(".id" = as.numeric(rownames(data)),
                                    data,
                                    eb.resid,
                                    eb.fitted,
                                    problem_dfs,
-                                   mar.fitted)
+                                   mar.fitted, 
+                                   .name_repair = "minimal")
     }
     
     return(return.tbl)
@@ -352,7 +355,7 @@ hlm_resid.lmerMod <- function(object, level = 1, standardize = FALSE, include.ls
 }
 
 #' @export
-#' @rdname hlm_resid.lmerMod
+#' @rdname hlm_resid
 #' @method hlm_resid lme
 hlm_resid.lme <- function(object, level = 1, standardize = FALSE, include.ls = TRUE, data = NULL, ...) {
   
@@ -408,7 +411,7 @@ hlm_resid.lme <- function(object, level = 1, standardize = FALSE, include.ls = T
     model.data <- model.frame(formula(dataform), data)
     
     # NA action
-    if(class(object$na.action) == "exclude"){ # if na.exclude
+    if(inherits(object$na.action, "exclude")){ # if na.exclude
       # fix data frame
       na.index <- which(!rownames(data) %in% rownames(model.data))
       na.fix.data <- data[which(rownames(data) %in% na.index),] %>% 
@@ -429,20 +432,22 @@ hlm_resid.lme <- function(object, level = 1, standardize = FALSE, include.ls = T
     
     # Continue to Assemble Tibble  
     if (include.ls == TRUE) {
-      return.tbl <- tibble::tibble("id" = as.numeric(rownames(model.data)),
+      return.tbl <- tibble::tibble(".id" = as.numeric(rownames(model.data)),
                                    model.data,
                                    eb.resid,
                                    eb.fitted,
                                    ls.resid,
                                    mar.resid,
-                                   mar.fitted)
+                                   mar.fitted, 
+                                   .name_repair = "minimal")
     } else { 
-      return.tbl <- tibble::tibble("id" = as.numeric(rownames(model.data)),
+      return.tbl <- tibble::tibble(".id" = as.numeric(rownames(model.data)),
                                    model.data,
                                    eb.resid,
                                    eb.fitted,
                                    mar.resid,
-                                   mar.fitted)
+                                   mar.fitted, 
+                                   .name_repair = "minimal")
     }
     
     return(return.tbl)

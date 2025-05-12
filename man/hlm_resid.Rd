@@ -2,8 +2,8 @@
 % Please edit documentation in R/hlm_resid.R
 \name{hlm_resid.default}
 \alias{hlm_resid.default}
-\alias{hlm_resid.lmerMod}
 \alias{hlm_resid}
+\alias{hlm_resid.lmerMod}
 \alias{hlm_resid.lme}
 \title{Calculating residuals from HLMs}
 \usage{
@@ -123,7 +123,7 @@ Objects into Tidy Tibbles. R package version 0.5.6.
 \url{https://CRAN.R-project.org/package=broom}
 }
 \seealso{
-\code{\link{hlm_augment}}, \code{\link{resid}}, \code{\link{ranef}}
+\code{\link{hlm_augment}}, \code{\link{resid}}, \code{\link[lme4:ranef]{lme4::ranef}}
 }
 \author{
 Adam Loy \email{loyad01@gmail.com}, Jack Moran, Jaylin Lowe

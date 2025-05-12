@@ -1,10 +1,11 @@
-#'@export
+#' @export
+#' @rdname hlm_influence
 hlm_influence <- function(model, ...) {
   UseMethod("hlm_influence", model)
 }
 
 #' @export
-#' @rdname hlm_influence.lmerMod
+#' @rdname hlm_influence
 #' @method hlm_influence default
 hlm_influence.default <- function(model, ...){
   stop(paste("there is no hlm_influence() method for objects of class",
@@ -20,7 +21,7 @@ hlm_influence.default <- function(model, ...){
 #'
 #'@export
 #'@method hlm_influence lmerMod
-#'@aliases hlm_influence
+#'@name hlm_influence
 #'@param model an object of class \code{lmerMod} or \code{lme}
 #'@param level used to define the group for which cases are deleted and influence
 #'diagnostics are calculated. If \code{level = 1} (default), then influence diagnostics are
@@ -55,6 +56,17 @@ hlm_influence.default <- function(model, ...){
 #'It is possible to set \code{level} and delete individual cases from different groups using 
 #'\code{delete}, so numeric indices should be double checked to confirm that they encompass entire groups.
 #'Additionally, if \code{delete} is specified, leverage values are not returned in the resulting tibble. 
+#'
+#' @examples
+#' \dontrun{
+#' data(sleepstudy, package = 'lme4')
+#' fm <- lme4::lmer(Reaction ~ Days + (Days | Subject), sleepstudy)
+#' 
+#' # Subject level deletion and diagnostics
+#' subject.del  <- case_delete(model = fm, group = "Subject", type = "both")
+#' subject.cooks <- cooks.distance(subject.del)
+#' subject.covtrace <- covtrace(subject.del)
+#' }
 hlm_influence.lmerMod <- function(model, level = 1, delete = NULL, approx = TRUE, leverage = "overall", data = NULL, ...) {
   
   if (!level %in% names(model@flist) & level != 1) {
@@ -73,7 +85,8 @@ hlm_influence.lmerMod <- function(model, level = 1, delete = NULL, approx = TRUE
   }
   
   na.action <- attr(model@frame, "na.action")
-  if(class(na.action) == "exclude" & is.null(data)) {
+  if(inherits(na.action, "exclude") & is.null(data)) {
+  # if(class(na.action) == "exclude" & is.null(data)) {
     stop("Please provide the data frame used to fit the model. This is necessary when the na.action is set to na.exclude.")
   }
   
@@ -106,7 +119,7 @@ hlm_influence.lmerMod <- function(model, level = 1, delete = NULL, approx = TRUE
     
     if (level == 1) {
       infl.tbl <- tibble::add_column(infl.tbl, model@frame, .before = 1)
-      if (class(na.action) == "exclude") {
+      if (inherits(na.action, "exclude")) {
         infl.tbl <- .lmerMod_add_NArows(model, infl.tbl, na.action, data)
       }
       infl.tbl <- tibble::add_column(infl.tbl, id = 1:nrow(infl.tbl), .before = 1)
@@ -142,7 +155,7 @@ hlm_influence.lmerMod <- function(model, level = 1, delete = NULL, approx = TRUE
     
     if (level == 1) {
       infl.tbl <- tibble::add_column(infl.tbl, model@frame, .before = 1)  
-      if (class(na.action) == "exclude") {
+      if (inherits(na.action, "exclude")) {
         infl.tbl <- .lmerMod_add_NArows(model, infl.tbl, na.action, data)
       }
       infl.tbl <- tibble::add_column(infl.tbl, id = 1:nrow(infl.tbl), .before = 1)
@@ -156,9 +169,8 @@ hlm_influence.lmerMod <- function(model, level = 1, delete = NULL, approx = TRUE
 }
 
 #' @export
-#' @rdname hlm_influence.lmerMod
+#' @rdname hlm_influence
 #' @method hlm_influence lme
-#' @aliases hlm_influence
 hlm_influence.lme <- function(model, level = 1, delete = NULL, approx = TRUE, leverage = "overall", ...) {
   
   if (!level %in% names(model$groups) & level != 1) {
@@ -218,7 +230,7 @@ hlm_influence.lme <- function(model, level = 1, delete = NULL, approx = TRUE, le
       
       infl.tbl <- tibble::add_column(infl.tbl, new.data, .before = 1) 
       
-      if (class(na.action) == "exclude") {
+      if (inherits(na.action, "exclude")) {
         infl.tbl <- .lme_add_NArows(model, infl.tbl, na.action, org.data = model$data, fixed.data = new.data)
       }
       infl.tbl <- tibble::add_column(infl.tbl, id = 1:nrow(infl.tbl), .before = 1)
@@ -261,7 +273,7 @@ hlm_influence.lme <- function(model, level = 1, delete = NULL, approx = TRUE, le
         as.data.frame()
       new.data <- model.frame(formula(dataform), data.fixed)
       infl.tbl <- tibble::add_column(infl.tbl, new.data, .before = 1)  
-      if (class(na.action) == "exclude") {
+      if (inherits(na.action, "exclude")) {
         infl.tbl <- .lme_add_NArows(model, infl.tbl, na.action, org.data = model$data, fixed.data = new.data)
       }
       infl.tbl <- tibble::add_column(infl.tbl, id = 1:nrow(infl.tbl), .before = 1)
